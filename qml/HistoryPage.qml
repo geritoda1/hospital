@@ -3,37 +3,28 @@ import QtQuick.Controls 2.15
 import QtQuick.Layouts 1.15
 
 Page {
-    background: Rectangle { color: "#F0F4F8" }
+    background: BackgroundWithDots { }
 
     header: Rectangle {
         width: parent.width
         height: 56
-        color: "#FFFFFF"
-        border.color: "#DDE6EF"; border.width: 1
+        color: Qt.rgba(1,1,1,0.08)
+        border.color: Qt.rgba(1,1,1,0.10); border.width: 1
 
         Row {
             anchors { left: parent.left; verticalCenter: parent.verticalCenter; leftMargin: 16 }
             spacing: 10
-            Text { text: "📋"; font.pixelSize: 22; anchors.verticalCenter: parent.verticalCenter }
+            Text { text: "📋"; font.pixelSize: 20; color: "#FFFFFF" }
             Text {
                 text: "История посещений"
                 font.pixelSize: 16; font.family: "Segoe UI"; font.weight: Font.SemiBold
-                color: "#1A2533"
-                anchors.verticalCenter: parent.verticalCenter
+                color: "#FFFFFF"
             }
         }
-
         Text {
             anchors { right: parent.right; verticalCenter: parent.verticalCenter; rightMargin: 16 }
             text: visitsModel.count + " записей"
-            font.pixelSize: 12; font.family: "Segoe UI"
-            color: "#9AAABB"
-        }
-
-        Rectangle {
-            anchors.bottom: parent.bottom
-            width: parent.width; height: 1
-            color: "#DDE6EF"
+            font.pixelSize: 12; color: Qt.rgba(1,1,1,0.50)
         }
     }
 
@@ -46,78 +37,62 @@ Page {
 
         delegate: Rectangle {
             width: parent ? parent.width : 0
-            height: delegateRow.implicitHeight + 20
-            radius: 10
-            color: "#FFFFFF"
-            border.color: "#DDE6EF"; border.width: 1
-
-            // Left accent stripe
-            Rectangle {
-                width: 4; height: parent.height - 16
-                radius: 2
-                color: "#1A6B9A"
-                anchors { left: parent.left; leftMargin: 8; verticalCenter: parent.verticalCenter }
-            }
+            height: 70
+            radius: 12
+            color: Qt.rgba(1,1,1,0.05)
+            border.color: Qt.rgba(1,1,1,0.10); border.width: 1
 
             Row {
-                id: delegateRow
-                anchors { left: parent.left; right: arrowText.left; verticalCenter: parent.verticalCenter }
-                anchors.leftMargin: 22
-                anchors.rightMargin: 8
+                anchors { left: parent.left; right: parent.right; verticalCenter: parent.verticalCenter; leftMargin: 16; rightMargin: 16 }
                 spacing: 12
 
-                // Icon
                 Rectangle {
-                    width: 40; height: 40; radius: 20
-                    color: "#EBF4FA"
-                    anchors.verticalCenter: parent.verticalCenter
-                    Text { text: "👤"; font.pixelSize: 18; anchors.centerIn: parent }
+                    width: 40; height: 40; radius: 10
+                    color: Qt.rgba(0.16, 0.66, 0.55, 0.20)
+                    Text { text: "👤"; font.pixelSize: 20; anchors.centerIn: parent }
                 }
 
                 Column {
                     spacing: 4
                     anchors.verticalCenter: parent.verticalCenter
-
+                    width: parent.width - 90
                     Text {
                         text: model.visitorName + " → " + model.patientName
-                        font.pixelSize: 13; font.family: "Segoe UI"; font.weight: Font.SemiBold
-                        color: "#1A2533"
+                        font.pixelSize: 13; font.weight: Font.SemiBold
+                        color: "#FFFFFF"
+                        elide: Text.ElideRight
+                        width: parent.width
                     }
-                    Row {
-                        spacing: 10
-                        Text {
-                            text: "🕐 " + model.visitTime
-                            font.pixelSize: 11; font.family: "Segoe UI"
-                            color: "#9AAABB"
-                        }
+                    Text {
+                        text: "🕐 " + model.visitTime
+                        font.pixelSize: 11; color: Qt.rgba(1,1,1,0.50)
                     }
                 }
-            }
 
-            Text {
-                id: arrowText
-                text: "›"
-                font.pixelSize: 22; color: "#C0CDD8"
-                anchors { right: parent.right; rightMargin: 14; verticalCenter: parent.verticalCenter }
+                Text {
+                    text: "›"
+                    font.pixelSize: 22
+                    color: Qt.rgba(1,1,1,0.30)
+                    anchors.verticalCenter: parent.verticalCenter
+                }
             }
 
             MouseArea {
                 anchors.fill: parent
                 hoverEnabled: true
-                onEntered: parent.color = "#F7FAFC"
-                onExited:  parent.color = "#FFFFFF"
+                onEntered: parent.color = Qt.rgba(1,1,1,0.10)
+                onExited: parent.color = Qt.rgba(1,1,1,0.05)
                 onClicked: stackView.push("VisitDetailPage.qml", { visitData: model })
                 cursorShape: Qt.PointingHandCursor
             }
         }
 
-        // Empty state
         Text {
             anchors.centerIn: parent
             visible: visitsModel.count === 0
-            text: "Нет записей о посещениях"
-            font.pixelSize: 14; font.family: "Segoe UI"
-            color: "#9AAABB"
+            text: "Нет посещений"
+            font.pixelSize: 14
+            color: Qt.rgba(1,1,1,0.50)
         }
     }
 }

@@ -3,58 +3,39 @@ import QtQuick.Controls 2.15
 import QtQuick.Layouts 1.15
 
 Page {
-    background: Rectangle { color: "#F0F4F8" }
+    background: BackgroundWithDots { }
 
     header: Rectangle {
         width: parent.width
         height: 56
-        color: "#FFFFFF"
-        border.color: "#DDE6EF"; border.width: 1
+        color: Qt.rgba(1,1,1,0.08)
+        border.color: Qt.rgba(1,1,1,0.10); border.width: 1
 
         Row {
             anchors { left: parent.left; verticalCenter: parent.verticalCenter; leftMargin: 16 }
             spacing: 10
-            Text { text: "🏥"; font.pixelSize: 22; anchors.verticalCenter: parent.verticalCenter }
+            Text { text: "🏥"; font.pixelSize: 20; color: "#FFFFFF" }
             Text {
-                text: "Занятость палат"
+                text: "Палаты и пациенты"
                 font.pixelSize: 16; font.family: "Segoe UI"; font.weight: Font.SemiBold
-                color: "#1A2533"
-                anchors.verticalCenter: parent.verticalCenter
+                color: "#FFFFFF"
             }
         }
 
-        Row {
+        Button {
             anchors { right: parent.right; verticalCenter: parent.verticalCenter; rightMargin: 12 }
-            spacing: 8
-
-            Rectangle {
-                width: refreshBtn.implicitWidth + 24
-                height: 32; radius: 8
-                color: refreshBtn.containsMouse ? "#EBF4FA" : "#F0F4F8"
-                border.color: "#DDE6EF"; border.width: 1
-                Behavior on color { ColorAnimation { duration: 120 } }
-
-                Text {
-                    id: refreshBtnLabel
-                    anchors.centerIn: parent
-                    text: "↻  Обновить"
-                    font.pixelSize: 12; font.family: "Segoe UI"
-                    color: "#1A6B9A"
-                }
-                MouseArea {
-                    id: refreshBtn
-                    anchors.fill: parent
-                    hoverEnabled: true
-                    cursorShape: Qt.PointingHandCursor
-                    onClicked: patientsModel.refresh()
-                }
+            text: "↻ Обновить"
+            flat: true
+            contentItem: Text {
+                text: parent.text
+                font.pixelSize: 12
+                color: Qt.rgba(1,1,1,0.70)
             }
-        }
-
-        Rectangle {
-            anchors.bottom: parent.bottom
-            width: parent.width; height: 1
-            color: "#DDE6EF"
+            background: Rectangle {
+                radius: 6
+                color: parent.pressed ? Qt.rgba(1,1,1,0.15) : (parent.hovered ? Qt.rgba(1,1,1,0.10) : "transparent")
+            }
+            onClicked: patientsModel.refresh()
         }
     }
 
@@ -67,66 +48,47 @@ Page {
 
         delegate: Rectangle {
             width: parent ? parent.width : 0
-            height: contentRow.implicitHeight + 20
-            radius: 10
-            color: "#FFFFFF"
-            border.color: "#DDE6EF"; border.width: 1
-
-            // Room badge
-            Rectangle {
-                id: roomBadge
-                width: 48; height: 48; radius: 10
-                color: "#EBF4FA"
-                anchors { left: parent.left; leftMargin: 14; verticalCenter: parent.verticalCenter }
-
-                Text {
-                    anchors.centerIn: parent
-                    text: model.roomNumber
-                    font.pixelSize: 13; font.family: "Segoe UI"; font.weight: Font.Bold
-                    color: "#1A6B9A"
-                }
-            }
+            height: 80
+            radius: 12
+            color: Qt.rgba(1,1,1,0.05)
+            border.color: Qt.rgba(1,1,1,0.10); border.width: 1
 
             Row {
-                id: contentRow
-                anchors {
-                    left: roomBadge.right; right: parent.right
-                    verticalCenter: parent.verticalCenter
-                    leftMargin: 14; rightMargin: 14
+                anchors.fill: parent
+                anchors.margins: 12
+                spacing: 14
+
+                Rectangle {
+                    width: 48; height: 48; radius: 12
+                    color: Qt.rgba(0.16, 0.66, 0.55, 0.20)
+                    Text {
+                        text: model.roomNumber
+                        font.pixelSize: 16; font.weight: Font.Bold
+                        color: "#28A98B"
+                        anchors.centerIn: parent
+                    }
                 }
-                spacing: 0
 
                 Column {
-                    spacing: 5
-                    width: parent.width
-
+                    spacing: 4
+                    anchors.verticalCenter: parent.verticalCenter
+                    width: parent.width - 80
                     Text {
                         text: model.fullName
-                        font.pixelSize: 14; font.family: "Segoe UI"; font.weight: Font.SemiBold
-                        color: "#1A2533"
+                        font.pixelSize: 14; font.weight: Font.SemiBold
+                        color: "#FFFFFF"
                         elide: Text.ElideRight
                         width: parent.width
                     }
-
-                    Row {
-                        spacing: 6
-                        Rectangle {
-                            width: diagLabel.implicitWidth + 14; height: 20; radius: 5
-                            color: "#EBF4FA"
-                            Text {
-                                id: diagLabel
-                                anchors.centerIn: parent
-                                text: "🩺  " + model.diagnosis
-                                font.pixelSize: 11; font.family: "Segoe UI"
-                                color: "#1A6B9A"
-                            }
-                        }
-                    }
-
                     Text {
-                        text: "Паспорт: " + model.passportData
-                        font.pixelSize: 11; font.family: "Segoe UI"
-                        color: "#9AAABB"
+                        text: "🩺 " + model.diagnosis
+                        font.pixelSize: 11; color: Qt.rgba(1,1,1,0.60)
+                        width: parent.width
+                        elide: Text.ElideRight
+                    }
+                    Text {
+                        text: "📄 " + model.passportData
+                        font.pixelSize: 10; color: Qt.rgba(1,1,1,0.40)
                     }
                 }
             }
@@ -135,9 +97,9 @@ Page {
         Text {
             anchors.centerIn: parent
             visible: patientsModel.count === 0
-            text: "Нет пациентов в палатах"
-            font.pixelSize: 14; font.family: "Segoe UI"
-            color: "#9AAABB"
+            text: "Нет пациентов"
+            font.pixelSize: 14
+            color: Qt.rgba(1,1,1,0.50)
         }
     }
 }

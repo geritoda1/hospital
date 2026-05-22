@@ -6,6 +6,8 @@ Button {
     property bool isDestructive: false
     property string iconText: ""
 
+    flat: true  // отключаем системную тему
+
     topPadding: 13
     bottomPadding: 13
     leftPadding: 20
@@ -35,22 +37,16 @@ Button {
     background: Rectangle {
         radius: 10
         color: {
-            if (root.isDestructive) return root.pressed ? "#C04040" : root.hovered ? "#D04848" : "#E05252"
-            return root.pressed ? "#124E72" : root.hovered ? "#1A5E88" : "#1A6B9A"
+            if (root.isDestructive) {
+                if (root.pressed) return "#B33A3A"
+                if (root.hovered) return "#D95C5C"
+                return "#E05252"
+            }
+            if (root.pressed) return "#0E4A6A"
+            if (root.hovered) return "#2A7BAA"
+            return "#1A6B9A"
         }
         Behavior on color { ColorAnimation { duration: 120 } }
-
-        // Subtle bottom shadow
-        layer.enabled: true
-        layer.effect: null
-
-        Rectangle {
-            anchors.fill: parent
-            radius: parent.radius
-            color: "transparent"
-            border.color: Qt.rgba(0,0,0,0.08)
-            border.width: 1
-        }
     }
 
     scale: pressed ? 0.97 : 1.0

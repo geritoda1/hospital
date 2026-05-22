@@ -3,101 +3,69 @@ import QtQuick.Controls 2.15
 import QtQuick.Layouts 1.15
 
 Page {
-    background: Rectangle { color: "#F0F4F8" }
+    background: BackgroundWithDots { }
 
     ScrollView {
         anchors.fill: parent
         contentWidth: availableWidth
 
         ColumnLayout {
-            width: Math.min(560, parent.width - 40)
+            width: Math.min(520, parent.width - 40)
             anchors.horizontalCenter: parent.horizontalCenter
             anchors.top: parent.top
             anchors.topMargin: 24
-            spacing: 0
+            spacing: 16
 
-            // Header banner
             Rectangle {
                 Layout.fillWidth: true
-                height: 72
-                radius: 12
-                color: "#28A98B"
-
-                Row {
-                    anchors { left: parent.left; verticalCenter: parent.verticalCenter; leftMargin: 20 }
-                    spacing: 14
-                    Text { text: "🚪"; font.pixelSize: 28; anchors.verticalCenter: parent.verticalCenter }
-                    Column {
-                        spacing: 3
-                        anchors.verticalCenter: parent.verticalCenter
-                        Text {
-                            text: "Регистрация посещения"
-                            font.pixelSize: 17; font.family: "Segoe UI"; font.weight: Font.Bold
-                            color: "#FFFFFF"
-                        }
-                        Text {
-                            text: "Укажите данные посетителя и пациента"
-                            font.pixelSize: 12; font.family: "Segoe UI"
-                            color: Qt.rgba(1,1,1,0.70)
-                        }
-                    }
-                }
-            }
-
-            // Visitor info card
-            Rectangle {
-                Layout.fillWidth: true
-                Layout.topMargin: 16
-                implicitHeight: visitorCol.implicitHeight + 40
-                radius: 12
-                color: "#FFFFFF"
-                border.color: "#DDE6EF"; border.width: 1
+                implicitHeight: formCol.implicitHeight + 40
+                radius: 18
+                color: Qt.rgba(1,1,1,0.05)
+                border.color: Qt.rgba(1,1,1,0.10); border.width: 1
 
                 ColumnLayout {
-                    id: visitorCol
-                    anchors { left: parent.left; right: parent.right; top: parent.top; margins: 20 }
-                    spacing: 4
+                    id: formCol
+                    anchors { left: parent.left; right: parent.right; top: parent.top; margins: 28 }
+                    spacing: 12
 
-                    Row {
-                        spacing: 8
-                        Rectangle { width: 3; height: 16; radius: 2; color: "#28A98B"; anchors.verticalCenter: parent.verticalCenter }
-                        Text { text: "Данные посетителя"; font.pixelSize: 13; font.family: "Segoe UI"; font.weight: Font.SemiBold; color: "#1A2533"; anchors.verticalCenter: parent.verticalCenter }
+                    Text {
+                        text: "🚪 Регистрация посещения"
+                        font.pixelSize: 18
+                        font.family: "Segoe UI"
+                        font.weight: Font.Bold
+                        color: "#FFFFFF"
+                        Layout.bottomMargin: 8
                     }
 
-                    Text { text: "ФИО посетителя"; font.pixelSize: 12; font.family: "Segoe UI"; font.weight: Font.Medium; color: "#5A6A7A"; Layout.topMargin: 8 }
-                    StyledField { id: visitorName; placeholderText: "Петров Пётр Петрович"; iconText: "👥"; Layout.fillWidth: true }
-
-                    Text { text: "Паспорт посетителя"; font.pixelSize: 12; font.family: "Segoe UI"; font.weight: Font.Medium; color: "#5A6A7A"; Layout.topMargin: 8 }
-                    StyledField { id: visitorPassport; placeholderText: "Серия и номер"; iconText: "📋"; Layout.fillWidth: true }
-
-                    Text { text: "Палата (куда идти)"; font.pixelSize: 12; font.family: "Segoe UI"; font.weight: Font.Medium; color: "#5A6A7A"; Layout.topMargin: 8 }
-                    StyledField { id: roomNumber; placeholderText: "Например: 214"; iconText: "🏠"; Layout.fillWidth: true }
-
-                    Item { height: 4 }
-                }
-            }
-
-            // Patient selector card
-            Rectangle {
-                Layout.fillWidth: true
-                Layout.topMargin: 12
-                implicitHeight: patientCol.implicitHeight + 40
-                radius: 12
-                color: "#FFFFFF"
-                border.color: "#DDE6EF"; border.width: 1
-
-                ColumnLayout {
-                    id: patientCol
-                    anchors { left: parent.left; right: parent.right; top: parent.top; margins: 20 }
-                    spacing: 8
-
-                    Row {
-                        spacing: 8
-                        Rectangle { width: 3; height: 16; radius: 2; color: "#1A6B9A"; anchors.verticalCenter: parent.verticalCenter }
-                        Text { text: "Выбор пациента"; font.pixelSize: 13; font.family: "Segoe UI"; font.weight: Font.SemiBold; color: "#1A2533"; anchors.verticalCenter: parent.verticalCenter }
+                    StyledField {
+                        id: visitorName
+                        placeholderText: "ФИО посетителя"
+                        iconText: "👥"
+                        Layout.fillWidth: true
                     }
 
-                    Text { text: "Пациент"; font.pixelSize: 12; font.family: "Segoe UI"; font.weight: Font.Medium; color: "#5A6A7A" }
+                    StyledField {
+                        id: visitorPassport
+                        placeholderText: "Паспорт посетителя"
+                        iconText: "📋"
+                        Layout.fillWidth: true
+                    }
+
+                    StyledField {
+                        id: roomNumber
+                        placeholderText: "Палата (куда идти)"
+                        iconText: "🏠"
+                        Layout.fillWidth: true
+                    }
+
+                    Text {
+                        text: "ВЫБОР ПАЦИЕНТА"
+                        font.pixelSize: 10
+                        font.weight: Font.Bold
+                        color: Qt.rgba(1,1,1,0.40)
+                        font.letterSpacing: 1.1
+                        Layout.topMargin: 4
+                    }
 
                     ComboBox {
                         id: patientCombo
@@ -107,22 +75,19 @@ Page {
                         valueRole: "patientId"
                         font.pixelSize: 13
                         font.family: "Segoe UI"
-
+                        background: Rectangle {
+                            radius: 10
+                            color: patientCombo.activeFocus ? Qt.rgba(1,1,1,0.10) : Qt.rgba(1,1,1,0.06)
+                            border.color: patientCombo.activeFocus ? "#28A98B" : Qt.rgba(1,1,1,0.12)
+                            border.width: 1
+                        }
                         contentItem: Text {
                             leftPadding: 14
                             text: patientCombo.displayText
                             font: patientCombo.font
-                            color: patientCombo.currentIndex >= 0 ? "#1A2533" : "#9AAABB"
+                            color: "#FFFFFF"
                             verticalAlignment: Text.AlignVCenter
                         }
-
-                        background: Rectangle {
-                            radius: 10
-                            color: patientCombo.activeFocus ? "#EBF4FA" : "#F7FAFC"
-                            border.color: patientCombo.activeFocus ? "#1A6B9A" : "#DDE6EF"
-                            border.width: patientCombo.activeFocus ? 2 : 1
-                        }
-
                         indicator: Text {
                             text: "▾"
                             font.pixelSize: 14
@@ -131,67 +96,33 @@ Page {
                             anchors.rightMargin: 12
                             anchors.verticalCenter: parent.verticalCenter
                         }
-
-                        implicitHeight: 46
-
-                        popup: Popup {
-                            y: patientCombo.height + 4
-                            width: patientCombo.width
-                            implicitHeight: contentItem.implicitHeight
-                            padding: 4
-
-                            background: Rectangle {
-                                radius: 10
-                                color: "#FFFFFF"
-                                border.color: "#DDE6EF"
-                                border.width: 1
-                            }
-
-                            contentItem: ListView {
-                                clip: true
-                                implicitHeight: contentHeight
-                                model: patientCombo.delegateModel
-                                currentIndex: patientCombo.highlightedIndex
-                            }
-                        }
-
                         delegate: ItemDelegate {
-                            width: parent ? parent.width : 0
-                            height: 40
+                            width: parent.width
+                            height: 36
                             contentItem: Text {
-                                text: model[patientCombo.textRole]
+                                text: model.fullName
                                 font.pixelSize: 13
-                                font.family: "Segoe UI"
-                                color: patientCombo.currentIndex === index ? "#1A6B9A" : "#1A2533"
-                                verticalAlignment: Text.AlignVCenter
-                                leftPadding: 10
+                                color: "#1A2533"
                             }
                             background: Rectangle {
-                                color: hovered ? "#EBF4FA" : "transparent"
-                                radius: 6
+                                color: hovered ? "#EBF4FA" : "white"
                             }
                         }
                     }
-
-                    Item { height: 4 }
                 }
             }
 
-            // Action card
             Rectangle {
                 Layout.fillWidth: true
-                Layout.topMargin: 12
                 implicitHeight: actionCol.implicitHeight + 32
-                radius: 12
-                color: "#FFFFFF"
-                border.color: "#DDE6EF"; border.width: 1
+                radius: 18
+                color: Qt.rgba(1,1,1,0.05)
+                border.color: Qt.rgba(1,1,1,0.10); border.width: 1
 
                 ColumnLayout {
                     id: actionCol
                     anchors { left: parent.left; right: parent.right; top: parent.top; margins: 16 }
                     spacing: 12
-
-                    StatusMessage { id: resultMsg; Layout.fillWidth: true }
 
                     PrimaryButton {
                         text: "Зарегистрировать посещение"
@@ -200,25 +131,28 @@ Page {
                         onClicked: {
                             resultMsg.message = ""
                             if (visitorName.text && visitorPassport.text && roomNumber.text && patientCombo.currentValue !== undefined) {
-                                var patientId = patientCombo.currentValue
-                                if (dbManager.addVisit(patientId, visitorName.text, visitorPassport.text, roomNumber.text)) {
+                                if (dbManager.addVisit(patientCombo.currentValue, visitorName.text, visitorPassport.text, roomNumber.text)) {
                                     visitsModel.refresh()
                                     visitorName.text = visitorPassport.text = roomNumber.text = ""
-                                    resultMsg.isSuccess = true; resultMsg.isError = false
-                                    resultMsg.message = "Посещение успешно зарегистрировано"
+                                    resultMsg.isSuccess = true
+                                    resultMsg.message = "Посещение зарегистрировано"
                                 } else {
-                                    resultMsg.isError = true; resultMsg.isSuccess = false
-                                    resultMsg.message = "Ошибка при регистрации"
+                                    resultMsg.isError = true
+                                    resultMsg.message = "Ошибка регистрации"
                                 }
                             } else {
-                                resultMsg.isError = true; resultMsg.isSuccess = false
+                                resultMsg.isError = true
                                 resultMsg.message = "Заполните все поля и выберите пациента"
                             }
                         }
                     }
+
+                    StatusMessage {
+                        id: resultMsg
+                        Layout.fillWidth: true
+                    }
                 }
             }
-
             Item { height: 24 }
         }
     }

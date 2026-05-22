@@ -43,6 +43,8 @@ qt_add_qml_module(appHospitalApp
         qml/StyledField.qml
         qml/Theme.qml
         QML_FILES qml/RegisterDialog.qml
+        QML_FILES qml/BackgroundWithDots.qml
+        QML_FILES qml/WindowControls.qml
 
 )
 
