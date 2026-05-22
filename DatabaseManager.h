@@ -17,12 +17,12 @@ public:
     bool init();
 
     Q_INVOKABLE bool login(const QString &login, const QString &password);
+    Q_INVOKABLE bool registerUser(const QString &login, const QString &password, const QString &fullName);
     Q_INVOKABLE bool addPatient(const QString &fullName, const QString &diagnosis,
                                 const QString &room, const QString &passport);
     Q_INVOKABLE bool addVisit(int patientId, const QString &visitorName,
                               const QString &visitorPassport, const QString &room);
 
-    // Модели будут отдельно, но для удобства можно получить списки
     int currentUserId() const;
     void setCurrentUserId(int id);
 
@@ -32,6 +32,8 @@ signals:
 private:
     QSqlDatabase m_db;
     int m_currentUserId;
+
+    QString hashPassword(const QString &password); // новый метод
 };
 
 #endif // DATABASEMANAGER_H

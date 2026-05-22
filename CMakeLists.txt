@@ -38,6 +38,12 @@ qt_add_qml_module(appHospitalApp
         qml/HistoryPage.qml
         qml/VisitDetailPage.qml
         qml/RoomsPage.qml
+        qml/PrimaryButton.qml
+        qml/StatusMessage.qml
+        qml/StyledField.qml
+        qml/Theme.qml
+        QML_FILES qml/RegisterDialog.qml
+
 )
 
 target_link_libraries(appHospitalApp

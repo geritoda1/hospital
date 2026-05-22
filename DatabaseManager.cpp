@@ -1,6 +1,7 @@
 #include "DatabaseManager.h"
 #include <QSqlError>
 #include <QDebug>
+#include <QCryptographicHash>
 
 DatabaseManager::DatabaseManager(QObject *parent) : QObject(parent), m_currentUserId(-1)
 {
@@ -10,6 +11,14 @@ DatabaseManager::~DatabaseManager()
 {
     if (m_db.isOpen())
         m_db.close();
+}
+
+QString DatabaseManager::hashPassword(const QString &password)
+{
+    QByteArray salt = "SomeRandomSaltForHospitalApp";
+    QByteArray combined = password.toUtf8() + salt;
+    QByteArray hash = QCryptographicHash::hash(combined, QCryptographicHash::Sha256);
+    return hash.toHex();
 }
 
 bool DatabaseManager::init()
@@ -22,16 +31,13 @@ bool DatabaseManager::init()
     }
 
     QSqlQuery query;
-    // Таблица сотрудников
     query.exec("CREATE TABLE IF NOT EXISTS employees ("
                "id INTEGER PRIMARY KEY AUTOINCREMENT, "
                "login TEXT UNIQUE, password TEXT, full_name TEXT)");
-    // Таблица пациентов
     query.exec("CREATE TABLE IF NOT EXISTS patients ("
                "id INTEGER PRIMARY KEY AUTOINCREMENT, "
                "full_name TEXT, diagnosis TEXT, room_number TEXT, passport_data TEXT, "
                "created_by INTEGER)");
-    // Таблица посещений
     query.exec("CREATE TABLE IF NOT EXISTS visits ("
                "id INTEGER PRIMARY KEY AUTOINCREMENT, "
                "patient_id INTEGER, visitor_full_name TEXT, visitor_passport TEXT, "
@@ -39,16 +45,7 @@ bool DatabaseManager::init()
                "created_by INTEGER, "
                "FOREIGN KEY(patient_id) REFERENCES patients(id))");
 
-    // Добавим тестового сотрудника, если никого нет
-    QSqlQuery check("SELECT COUNT(*) FROM employees");
-    if (check.next() && check.value(0).toInt() == 0) {
-        query.prepare("INSERT INTO employees (login, password, full_name) VALUES (?, ?, ?)");
-        query.addBindValue("admin");
-        query.addBindValue("admin");
-        query.addBindValue("Администратор");
-        query.exec();
-    }
-
+    // НЕ добавляем тестового пользователя — только таблицы
     return true;
 }
 
@@ -57,13 +54,28 @@ bool DatabaseManager::login(const QString &login, const QString &password)
     QSqlQuery query;
     query.prepare("SELECT id FROM employees WHERE login = ? AND password = ?");
     query.addBindValue(login);
-    query.addBindValue(password);
+    query.addBindValue(hashPassword(password));
     if (query.exec() && query.next()) {
         m_currentUserId = query.value(0).toInt();
         emit currentUserIdChanged();
         return true;
     }
     return false;
+}
+
+bool DatabaseManager::registerUser(const QString &login, const QString &password, const QString &fullName)
+{
+    QSqlQuery query;
+    query.prepare("INSERT INTO employees (login, password, full_name) VALUES (?, ?, ?)");
+    query.addBindValue(login);
+    query.addBindValue(hashPassword(password));
+    query.addBindValue(fullName);
+    if (query.exec()) {
+        return true;
+    } else {
+        qDebug() << "Ошибка регистрации:" << query.lastError().text();
+        return false;
+    }
 }
 
 bool DatabaseManager::addPatient(const QString &fullName, const QString &diagnosis,
@@ -85,7 +97,6 @@ bool DatabaseManager::addVisit(int patientId, const QString &visitorName,
                                const QString &visitorPassport, const QString &room)
 {
     if (m_currentUserId < 0) return false;
-    // При желании можно проверить, что пациент существует
     QSqlQuery query;
     query.prepare("INSERT INTO visits (patient_id, visitor_full_name, visitor_passport, room_number, created_by) "
                   "VALUES (?, ?, ?, ?, ?)");
