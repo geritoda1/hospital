@@ -14,6 +14,7 @@ Page {
                 TabButton { text: "Запись пациента" }
                 TabButton { text: "Посещение" }
                 TabButton { text: "История" }
+                TabButton { text: "Палаты" }      // <--- новая вкладка
             }
             Button {
                 text: "Выйти"
@@ -31,5 +32,6 @@ Page {
         AddPatientPage { }
         AddVisitPage { }
         HistoryPage { }
+        RoomsPage { }                             // <--- новая страница
     }
 }

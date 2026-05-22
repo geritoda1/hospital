@@ -37,6 +37,7 @@ qt_add_qml_module(appHospitalApp
         qml/AddVisitPage.qml
         qml/HistoryPage.qml
         qml/VisitDetailPage.qml
+        qml/RoomsPage.qml
 )
 
 target_link_libraries(appHospitalApp
