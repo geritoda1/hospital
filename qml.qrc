@@ -1,0 +1,12 @@
+<!DOCTYPE RCC>
+<RCC version="1.0">
+    <qresource prefix="/">
+        <file>qml/main.qml</file>
+        <file>qml/LoginPage.qml</file>
+        <file>qml/MainTabs.qml</file>
+        <file>qml/AddPatientPage.qml</file>
+        <file>qml/AddVisitPage.qml</file>
+        <file>qml/HistoryPage.qml</file>
+        <file>qml/VisitDetailPage.qml</file>
+    </qresource>
+</RCC>
