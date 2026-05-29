@@ -54,8 +54,8 @@ Page {
                         id: doctorCombo
                         Layout.fillWidth: true
                         textRole: "fullName"
-                        model: doctorsModel
                         valueRole: "doctorId"
+                        model: doctorsModel
                         font.pixelSize: 13
                         background: Rectangle {
                             radius: 10
@@ -65,7 +65,7 @@ Page {
                         }
                         contentItem: Text {
                             leftPadding: 14
-                            text: displayText
+                            text: doctorCombo.currentText || "Выберите врача"
                             font: doctorCombo.font
                             color: "#FFFFFF"
                             verticalAlignment: Text.AlignVCenter
@@ -81,9 +81,24 @@ Page {
                         delegate: ItemDelegate {
                             width: parent.width
                             height: 36
-                            contentItem: Text { text: model.fullName; font.pixelSize: 13; color: "#1A2533" }
-                            background: Rectangle { color: hovered ? "#EBF4FA" : "white" }
+                            contentItem: Text {
+                                text: model.fullName
+                                font.pixelSize: 13
+                                color: "#1A2533"
+                            }
+                            background: Rectangle {
+                                color: hovered ? "#EBF4FA" : "white"
+                            }
                         }
+                    }
+
+                    // Визуальная метка для подтверждения выбора
+                    Text {
+                        text: "✓ Выбран врач: " + (doctorCombo.currentText ? doctorCombo.currentText : "не выбран")
+                        font.pixelSize: 11
+                        color: Qt.rgba(1,1,1,0.60)
+                        Layout.topMargin: 4
+                        visible: true
                     }
                 }
             }
@@ -107,7 +122,8 @@ Page {
                         onClicked: {
                             resultMsg.message = ""
                             if (nameField.text && diagnosisField.text && roomField.text && passportField.text) {
-                                var doctorId = doctorCombo.currentValue || 0
+                                var doctorId = doctorCombo.currentValue ? parseInt(doctorCombo.currentValue) : 0
+                                console.log("Saving patient with doctorId:", doctorId)
                                 if (dbManager.addPatient(nameField.text, diagnosisField.text, roomField.text,
                                                           passportField.text, doctorId)) {
                                     patientsModel.refresh()
@@ -130,5 +146,9 @@ Page {
             }
             Item { height: 24 }
         }
+    }
+
+    Component.onCompleted: {
+        doctorsModel.refresh()
     }
 }
