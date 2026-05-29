@@ -46,7 +46,7 @@ void PatientsModel::refresh()
     m_patients.clear();
     QSqlQuery query(
         "SELECT p.id, p.full_name, p.diagnosis, p.room_number, p.passport_data, "
-        "d.full_name as doctor_name "
+        "COALESCE(d.full_name, 'Не назначен') as doctor_name "
         "FROM patients p LEFT JOIN doctors d ON p.doctor_id = d.id "
         "WHERE p.discharged = 0 ORDER BY p.full_name"
         );

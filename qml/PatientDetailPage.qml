@@ -22,26 +22,59 @@ Page {
         id: treatmentDialog
         modal: true
         anchors.centerIn: Overlay.overlay
-        width: 400
-        height: 200
+        width: 420
+        height: 220
+        closePolicy: Popup.CloseOnEscape
+        background: Rectangle {
+            color: "#0D3349"
+            radius: 18
+            border.color: "#28A98B"
+            border.width: 1
+        }
         ColumnLayout {
-            anchors.fill: parent; anchors.margins: 20
-            Text { text: "Добавить лечение"; font.pixelSize: 18; font.weight: Font.Bold; color: "#FFFFFF" }
+            anchors.fill: parent
+            anchors.margins: 24
+            spacing: 16
+            Text {
+                text: "💊 Добавить лечение"
+                font.pixelSize: 18; font.weight: Font.Bold
+                color: "#FFFFFF"
+            }
             TextField {
                 id: treatmentText
                 Layout.fillWidth: true
-                placeholderText: "Описание лечения"
-                background: Rectangle { radius: 8; color: Qt.rgba(1,1,1,0.10); border.color: "#28A98B" }
-                color: "white"
+                placeholderText: "Введите описание лечения"
+                background: Rectangle {
+                    radius: 10
+                    color: activeFocus ? Qt.rgba(1,1,1,0.10) : Qt.rgba(1,1,1,0.06)
+                    border.color: activeFocus ? "#28A98B" : Qt.rgba(1,1,1,0.12)
+                    border.width: 1
+                }
+                color: "#FFFFFF"
+                placeholderTextColor: Qt.rgba(1,1,1,0.40)
+                font.pixelSize: 13
             }
             Row {
                 spacing: 12
                 Layout.alignment: Qt.AlignRight
-                Button { text: "Отмена"; onClicked: treatmentDialog.close() }
+                Button {
+                    text: "Отмена"
+                    background: Rectangle {
+                        color: parent.pressed ? Qt.rgba(1,1,1,0.20) : (parent.hovered ? Qt.rgba(1,1,1,0.10) : "transparent")
+                        radius: 6
+                        border.color: Qt.rgba(1,1,1,0.30)
+                        border.width: 1
+                    }
+                    contentItem: Text { text: parent.text; color: Qt.rgba(1,1,1,0.70) }
+                    onClicked: treatmentDialog.close()
+                }
                 Button {
                     text: "Добавить"
-                    background: Rectangle { color: "#28A98B"; radius: 6 }
-                    contentItem: Text { text: parent.text; color: "white" }
+                    background: Rectangle {
+                        color: parent.pressed ? "#1E8B72" : (parent.hovered ? "#2EBD9C" : "#28A98B")
+                        radius: 6
+                    }
+                    contentItem: Text { text: parent.text; color: "#FFFFFF" }
                     onClicked: {
                         if (treatmentText.text) {
                             dbManager.addTreatment(patientData.patientId, treatmentText.text)
@@ -101,13 +134,11 @@ Page {
 
             Rectangle {
                 Layout.fillWidth: true
-                implicitHeight: treatmentCol.implicitHeight + 40
                 radius: 18
                 color: Qt.rgba(1,1,1,0.05)
                 border.color: Qt.rgba(1,1,1,0.10); border.width: 1
                 ColumnLayout {
-                    id: treatmentCol
-                    anchors { left: parent.left; right: parent.right; top: parent.top; margins: 24 }
+                    anchors { left: parent.left; right: parent.right; top: parent.top; margins: 20 }
                     spacing: 12
                     Row {
                         spacing: 12
@@ -119,19 +150,29 @@ Page {
                             onClicked: treatmentDialog.open()
                         }
                     }
-                    ListView {
-                        Layout.fillWidth: true
-                        height: treatmentModel.count * 60
+                    Repeater {
                         model: treatmentModel
                         delegate: Rectangle {
-                            width: parent.width; height: 50
-                            color: "transparent"
-                            Column {
-                                Text { text: model.description; font.pixelSize: 12; color: "#FFFFFF" }
-                                Text { text: model.createdAt; font.pixelSize: 10; color: Qt.rgba(1,1,1,0.50) }
+                            width: parent.width
+                            height: treatmentRow.implicitHeight + 20
+                            color: Qt.rgba(1,1,1,0.03)
+                            radius: 8
+                            Row {
+                                id: treatmentRow
+                                anchors { left: parent.left; right: parent.right; verticalCenter: parent.verticalCenter; margins: 12 }
+                                spacing: 12
+                                Text { text: "💊"; font.pixelSize: 14; anchors.verticalCenter: parent.verticalCenter }
+                                Column {
+                                    spacing: 4
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    width: parent.width - 60
+                                    Text { text: model.description; font.pixelSize: 12; color: "#FFFFFF"; wrapMode: Text.Wrap; width: parent.width }
+                                    Text { text: model.createdAt; font.pixelSize: 10; color: Qt.rgba(1,1,1,0.50) }
+                                }
                             }
                         }
                     }
+                    Item { height: 10 }
                 }
             }
             Item { height: 24 }

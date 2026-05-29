@@ -7,45 +7,55 @@ Page {
 
     property var editDoctorId: null
 
-    // Диалог добавления/редактирования врача
     Popup {
         id: doctorDialog
         modal: true
         anchors.centerIn: Overlay.overlay
         width: 400
-        height: dialogCol.implicitHeight + 50
+        height: dialogCol.implicitHeight + 60
         closePolicy: Popup.CloseOnEscape
-
         property bool isEdit: false
-
+        background: Rectangle {
+            color: "#0D3349"
+            radius: 18
+            border.color: "#28A98B"
+            border.width: 1
+        }
         ColumnLayout {
             id: dialogCol
             anchors.fill: parent
-            anchors.margins: 20
-            spacing: 12
-
+            anchors.margins: 24
+            spacing: 16
             Text {
-                text: doctorDialog.isEdit ? "Редактировать врача" : "Новый врач"
+                text: doctorDialog.isEdit ? "✎ Редактировать врача" : "➕ Новый врач"
                 font.pixelSize: 18; font.weight: Font.Bold
                 color: "#FFFFFF"
             }
-
             StyledField { id: editFullName; placeholderText: "ФИО врача"; iconText: "👨‍⚕️"; Layout.fillWidth: true }
             StyledField { id: editPhone; placeholderText: "Телефон"; iconText: "📞"; Layout.fillWidth: true }
             StyledField { id: editPosition; placeholderText: "Должность (терапевт, хирург...)"; iconText: "🏥"; Layout.fillWidth: true }
             StyledField { id: editPassport; placeholderText: "Паспортные данные"; iconText: "📋"; Layout.fillWidth: true }
-
             Row {
                 spacing: 12
                 Layout.alignment: Qt.AlignRight
                 Button {
                     text: "Отмена"
+                    background: Rectangle {
+                        color: parent.pressed ? Qt.rgba(1,1,1,0.20) : (parent.hovered ? Qt.rgba(1,1,1,0.10) : "transparent")
+                        radius: 6
+                        border.color: Qt.rgba(1,1,1,0.30)
+                        border.width: 1
+                    }
+                    contentItem: Text { text: parent.text; color: Qt.rgba(1,1,1,0.70) }
                     onClicked: doctorDialog.close()
                 }
                 Button {
                     text: "Сохранить"
-                    background: Rectangle { color: "#28A98B"; radius: 6 }
-                    contentItem: Text { text: parent.text; color: "white" }
+                    background: Rectangle {
+                        color: parent.pressed ? "#1E8B72" : (parent.hovered ? "#2EBD9C" : "#28A98B")
+                        radius: 6
+                    }
+                    contentItem: Text { text: parent.text; color: "#FFFFFF" }
                     onClicked: {
                         if (doctorDialog.isEdit && editDoctorId) {
                             dbManager.updateDoctor(editDoctorId, editFullName.text, editPhone.text,
@@ -95,16 +105,16 @@ Page {
         spacing: 8
         model: doctorsModel
         clip: true
-
         delegate: Rectangle {
             width: parent.width
-            height: 100
+            height: 110
             radius: 12
             color: Qt.rgba(1,1,1,0.05)
             border.color: Qt.rgba(1,1,1,0.10); border.width: 1
 
             Row {
-                anchors.fill: parent; anchors.margins: 12
+                anchors.fill: parent
+                anchors.margins: 12
                 spacing: 14
                 Rectangle {
                     width: 48; height: 48; radius: 24
@@ -147,9 +157,9 @@ Page {
                             if (dbManager.deleteDoctor(model.doctorId)) {
                                 doctorsModel.refresh()
                             } else {
-                                statusMsg.text = "Нельзя удалить врача: есть активные пациенты"
-                                statusMsg.visible = true
-                                hideTimer.start()
+                                errorMsg.text = "Нельзя удалить врача: есть активные пациенты"
+                                errorMsg.visible = true
+                                hideErrorTimer.start()
                             }
                         }
                     }
@@ -158,6 +168,6 @@ Page {
         }
     }
 
-    Timer { id: hideTimer; interval: 3000; onTriggered: statusMsg.visible = false }
-    Text { id: statusMsg; anchors.bottom: parent.bottom; anchors.horizontalCenter: parent.horizontalCenter; color: "#E05252"; visible: false }
+    Timer { id: hideErrorTimer; interval: 3000; onTriggered: errorMsg.visible = false }
+    Text { id: errorMsg; anchors.bottom: parent.bottom; anchors.horizontalCenter: parent.horizontalCenter; color: "#E05252"; visible: false }
 }
