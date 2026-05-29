@@ -24,7 +24,7 @@ Page {
             }
         }
 
-        // Tab bar centered
+        // Tab bar
         Row {
             anchors.centerIn: parent
             spacing: 4
@@ -35,6 +35,7 @@ Page {
                     { text: "Посещение", icon: "🚪" },
                     { text: "История",   icon: "📋" },
                     { text: "Палаты",    icon: "🏠" },
+                    { text: "Врачи",     icon: "👨‍⚕️" }   // новая вкладка
                 ]
                 delegate: Rectangle {
                     width: tabLabel.implicitWidth + 28
@@ -93,7 +94,9 @@ Page {
 
             MouseArea {
                 id: logoutArea
-                anchors.fill: parent; hoverEnabled: true; cursorShape: Qt.PointingHandCursor
+                anchors.fill: parent
+                hoverEnabled: true
+                cursorShape: Qt.PointingHandCursor
                 onClicked: logout()
             }
         }
@@ -108,5 +111,6 @@ Page {
         AddVisitPage   { }
         HistoryPage    { }
         RoomsPage      { }
+        DoctorsPage    { }   // новая вкладка
     }
 }

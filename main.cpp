@@ -8,6 +8,8 @@
 #include "DatabaseManager.h"
 #include "PatientsModel.h"
 #include "VisitsModel.h"
+#include "DoctorsModel.h"
+
 
 int main(int argc, char *argv[])
 {
@@ -20,11 +22,13 @@ int main(int argc, char *argv[])
 
     PatientsModel patientsModel;
     VisitsModel visitsModel;
+    DoctorsModel doctorsModel;
 
     QQmlApplicationEngine engine;
     engine.rootContext()->setContextProperty("dbManager", &dbManager);
     engine.rootContext()->setContextProperty("patientsModel", &patientsModel);
     engine.rootContext()->setContextProperty("visitsModel", &visitsModel);
+    engine.rootContext()->setContextProperty("doctorsModel", &doctorsModel);
 
     // Загружаем из файловой системы (папка qml копируется POST_BUILD)
     QString qmlPath = QCoreApplication::applicationDirPath() + "/qml/main.qml";

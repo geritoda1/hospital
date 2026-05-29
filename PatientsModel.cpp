@@ -1,7 +1,5 @@
 #include "PatientsModel.h"
 #include <QSqlQuery>
-#include <QSqlError>
-#include <QDebug>
 
 PatientsModel::PatientsModel(QObject *parent) : QAbstractListModel(parent)
 {
@@ -25,6 +23,7 @@ QVariant PatientsModel::data(const QModelIndex &index, int role) const
     case DiagnosisRole: return p.diagnosis;
     case RoomRole: return p.room;
     case PassportRole: return p.passport;
+    case DoctorNameRole: return p.doctorName;
     default: return QVariant();
     }
 }
@@ -37,6 +36,7 @@ QHash<int, QByteArray> PatientsModel::roleNames() const
     roles[DiagnosisRole] = "diagnosis";
     roles[RoomRole] = "roomNumber";
     roles[PassportRole] = "passportData";
+    roles[DoctorNameRole] = "doctorName";
     return roles;
 }
 
@@ -44,7 +44,12 @@ void PatientsModel::refresh()
 {
     beginResetModel();
     m_patients.clear();
-    QSqlQuery query("SELECT id, full_name, diagnosis, room_number, passport_data FROM patients ORDER BY full_name");
+    QSqlQuery query(
+        "SELECT p.id, p.full_name, p.diagnosis, p.room_number, p.passport_data, "
+        "d.full_name as doctor_name "
+        "FROM patients p LEFT JOIN doctors d ON p.doctor_id = d.id "
+        "WHERE p.discharged = 0 ORDER BY p.full_name"
+        );
     while (query.next()) {
         Patient p;
         p.id = query.value(0).toInt();
@@ -52,6 +57,7 @@ void PatientsModel::refresh()
         p.diagnosis = query.value(2).toString();
         p.room = query.value(3).toString();
         p.passport = query.value(4).toString();
+        p.doctorName = query.value(5).toString();
         m_patients.append(p);
     }
     endResetModel();

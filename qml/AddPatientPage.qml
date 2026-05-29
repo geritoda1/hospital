@@ -31,38 +31,59 @@ Page {
                     Text {
                         text: "🏥 Новая госпитализация"
                         font.pixelSize: 18
-                        font.family: "Segoe UI"
                         font.weight: Font.Bold
                         color: "#FFFFFF"
                         Layout.bottomMargin: 8
                     }
 
-                    StyledField {
-                        id: nameField
-                        placeholderText: "ФИО пациента"
-                        iconText: "👤"
-                        Layout.fillWidth: true
+                    StyledField { id: nameField; placeholderText: "ФИО пациента"; iconText: "👤"; Layout.fillWidth: true }
+                    StyledField { id: diagnosisField; placeholderText: "Диагноз"; iconText: "🩺"; Layout.fillWidth: true }
+                    StyledField { id: roomField; placeholderText: "Номер палаты"; iconText: "🏠"; Layout.fillWidth: true }
+                    StyledField { id: passportField; placeholderText: "Паспортные данные"; iconText: "📋"; Layout.fillWidth: true }
+
+                    Text {
+                        text: "ЛЕЧАЩИЙ ВРАЧ"
+                        font.pixelSize: 10
+                        font.weight: Font.Bold
+                        color: Qt.rgba(1,1,1,0.40)
+                        font.letterSpacing: 1.1
+                        Layout.topMargin: 8
                     }
 
-                    StyledField {
-                        id: diagnosisField
-                        placeholderText: "Диагноз"
-                        iconText: "🩺"
+                    ComboBox {
+                        id: doctorCombo
                         Layout.fillWidth: true
-                    }
-
-                    StyledField {
-                        id: roomField
-                        placeholderText: "Номер палаты"
-                        iconText: "🏠"
-                        Layout.fillWidth: true
-                    }
-
-                    StyledField {
-                        id: passportField
-                        placeholderText: "Паспортные данные"
-                        iconText: "📋"
-                        Layout.fillWidth: true
+                        textRole: "fullName"
+                        model: doctorsModel
+                        valueRole: "doctorId"
+                        font.pixelSize: 13
+                        background: Rectangle {
+                            radius: 10
+                            color: activeFocus ? Qt.rgba(1,1,1,0.10) : Qt.rgba(1,1,1,0.06)
+                            border.color: activeFocus ? "#28A98B" : Qt.rgba(1,1,1,0.12)
+                            border.width: 1
+                        }
+                        contentItem: Text {
+                            leftPadding: 14
+                            text: displayText
+                            font: doctorCombo.font
+                            color: "#FFFFFF"
+                            verticalAlignment: Text.AlignVCenter
+                        }
+                        indicator: Text {
+                            text: "▾"
+                            font.pixelSize: 14
+                            color: "#9AAABB"
+                            anchors.right: parent.right
+                            anchors.rightMargin: 12
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+                        delegate: ItemDelegate {
+                            width: parent.width
+                            height: 36
+                            contentItem: Text { text: model.fullName; font.pixelSize: 13; color: "#1A2533" }
+                            background: Rectangle { color: hovered ? "#EBF4FA" : "white" }
+                        }
                     }
                 }
             }
@@ -86,9 +107,12 @@ Page {
                         onClicked: {
                             resultMsg.message = ""
                             if (nameField.text && diagnosisField.text && roomField.text && passportField.text) {
-                                if (dbManager.addPatient(nameField.text, diagnosisField.text, roomField.text, passportField.text)) {
+                                var doctorId = doctorCombo.currentValue || 0
+                                if (dbManager.addPatient(nameField.text, diagnosisField.text, roomField.text,
+                                                          passportField.text, doctorId)) {
                                     patientsModel.refresh()
                                     nameField.text = diagnosisField.text = roomField.text = passportField.text = ""
+                                    doctorCombo.currentIndex = -1
                                     resultMsg.isSuccess = true
                                     resultMsg.message = "Пациент добавлен"
                                 } else {
@@ -101,11 +125,7 @@ Page {
                             }
                         }
                     }
-
-                    StatusMessage {
-                        id: resultMsg
-                        Layout.fillWidth: true
-                    }
+                    StatusMessage { id: resultMsg; Layout.fillWidth: true }
                 }
             }
             Item { height: 24 }

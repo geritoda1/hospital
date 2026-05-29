@@ -1,23 +1,21 @@
-#ifndef PATIENTSMODEL_H
-#define PATIENTSMODEL_H
+#ifndef DOCTORSMODEL_H
+#define DOCTORSMODEL_H
 
 #include <QAbstractListModel>
-#include <QVector>
 
-class PatientsModel : public QAbstractListModel
+class DoctorsModel : public QAbstractListModel
 {
     Q_OBJECT
 public:
     enum Roles {
         IdRole = Qt::UserRole + 1,
         FullNameRole,
-        DiagnosisRole,
-        RoomRole,
-        PassportRole,
-        DoctorNameRole
+        PhoneRole,
+        PositionRole,
+        PassportRole
     };
 
-    explicit PatientsModel(QObject *parent = nullptr);
+    explicit DoctorsModel(QObject *parent = nullptr);
     int rowCount(const QModelIndex &parent = QModelIndex()) const override;
     QVariant data(const QModelIndex &index, int role) const override;
     QHash<int, QByteArray> roleNames() const override;
@@ -25,16 +23,14 @@ public:
     Q_INVOKABLE void refresh();
 
 private:
-    struct Patient {
+    struct Doctor {
         int id;
         QString fullName;
-        QString diagnosis;
-        QString room;
+        QString phone;
+        QString position;
         QString passport;
-        int doctorId;
-        QString doctorName;
     };
-    QVector<Patient> m_patients;
+    QVector<Doctor> m_doctors;
 };
 
-#endif // PATIENTSMODEL_H
+#endif // DOCTORSMODEL_H

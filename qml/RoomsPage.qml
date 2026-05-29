@@ -5,6 +5,88 @@ import QtQuick.Layouts 1.15
 Page {
     background: BackgroundWithDots { }
 
+    Popup {
+        id: confirmDialog
+        modal: true
+        anchors.centerIn: Overlay.overlay
+        width: 320
+        height: 150
+        closePolicy: Popup.CloseOnEscape
+
+        property string text: ""
+        property var acceptCallback: null
+
+        background: Rectangle {
+            color: "#0D3349"
+            radius: 12
+            border.color: "#28A98B"
+            border.width: 1
+        }
+
+        ColumnLayout {
+            anchors.fill: parent
+            anchors.margins: 16
+            spacing: 12
+
+            Text {
+                text: confirmDialog.text
+                color: "#FFFFFF"
+                wrapMode: Text.Wrap
+                Layout.fillWidth: true
+                font.pixelSize: 13
+                font.family: "Segoe UI"
+            }
+
+            Row {
+                spacing: 12
+                Layout.alignment: Qt.AlignRight
+
+                Button {
+                    text: "Да"
+                    background: Rectangle {
+                        color: parent.pressed ? "#1E8B72" : (parent.hovered ? "#2EBD9C" : "#28A98B")
+                        radius: 6
+                    }
+                    contentItem: Text {
+                        text: parent.text
+                        color: "#FFFFFF"
+                        font.pixelSize: 12
+                        horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignVCenter
+                    }
+                    onClicked: {
+                        if (confirmDialog.acceptCallback) confirmDialog.acceptCallback()
+                        confirmDialog.close()
+                    }
+                }
+
+                Button {
+                    text: "Нет"
+                    background: Rectangle {
+                        color: parent.pressed ? Qt.rgba(1,1,1,0.20) : (parent.hovered ? Qt.rgba(1,1,1,0.10) : "transparent")
+                        radius: 6
+                        border.color: Qt.rgba(1,1,1,0.30)
+                        border.width: 1
+                    }
+                    contentItem: Text {
+                        text: parent.text
+                        color: Qt.rgba(1,1,1,0.70)
+                        font.pixelSize: 12
+                        horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignVCenter
+                    }
+                    onClicked: confirmDialog.close()
+                }
+            }
+        }
+    }
+
+    Timer {
+        id: hideTimer
+        interval: 3000
+        onTriggered: statusMessage.visible = false
+    }
+
     header: Rectangle {
         width: parent.width
         height: 56
@@ -39,67 +121,134 @@ Page {
         }
     }
 
-    ListView {
+    ColumnLayout {
         anchors.fill: parent
-        anchors.margins: 12
-        spacing: 8
-        model: patientsModel
-        clip: true
+        spacing: 0
 
-        delegate: Rectangle {
-            width: parent ? parent.width : 0
-            height: 80
-            radius: 12
-            color: Qt.rgba(1,1,1,0.05)
-            border.color: Qt.rgba(1,1,1,0.10); border.width: 1
+        ListView {
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+            Layout.margins: 12
+            spacing: 8
+            model: patientsModel
+            clip: true
 
-            Row {
-                anchors.fill: parent
-                anchors.margins: 12
-                spacing: 14
+            delegate: Rectangle {
+                width: parent ? parent.width : 0
+                height: 80
+                radius: 12
+                color: Qt.rgba(1,1,1,0.05)
+                border.color: Qt.rgba(1,1,1,0.10); border.width: 1
 
-                Rectangle {
-                    width: 48; height: 48; radius: 12
-                    color: Qt.rgba(0.16, 0.66, 0.55, 0.20)
-                    Text {
-                        text: model.roomNumber
-                        font.pixelSize: 16; font.weight: Font.Bold
-                        color: "#28A98B"
-                        anchors.centerIn: parent
+                Row {
+                    anchors.fill: parent
+                    anchors.margins: 12
+                    spacing: 14
+
+                    Rectangle {
+                        width: 48; height: 48; radius: 12
+                        color: Qt.rgba(0.16, 0.66, 0.55, 0.20)
+                        Text {
+                            text: model.roomNumber
+                            font.pixelSize: 16; font.weight: Font.Bold
+                            color: "#28A98B"
+                            anchors.centerIn: parent
+                        }
                     }
-                }
 
-                Column {
-                    spacing: 4
-                    anchors.verticalCenter: parent.verticalCenter
-                    width: parent.width - 80
-                    Text {
-                        text: model.fullName
-                        font.pixelSize: 14; font.weight: Font.SemiBold
-                        color: "#FFFFFF"
-                        elide: Text.ElideRight
-                        width: parent.width
+                    Column {
+                        spacing: 4
+                        anchors.verticalCenter: parent.verticalCenter
+                        width: parent.width - 160
+                        Text {
+                            text: model.fullName
+                            font.pixelSize: 14; font.weight: Font.SemiBold
+                            color: "#FFFFFF"
+                            elide: Text.ElideRight
+                            width: parent.width
+                        }
+                        Text {
+                            text: "🩺 " + model.diagnosis
+                            font.pixelSize: 11; color: Qt.rgba(1,1,1,0.60)
+                            width: parent.width
+                            elide: Text.ElideRight
+                        }
+                        Text {
+                            text: "📄 " + model.passportData
+                            font.pixelSize: 10; color: Qt.rgba(1,1,1,0.40)
+                        }
                     }
-                    Text {
-                        text: "🩺 " + model.diagnosis
-                        font.pixelSize: 11; color: Qt.rgba(1,1,1,0.60)
-                        width: parent.width
-                        elide: Text.ElideRight
+
+                    // Внутри delegate, после Column с информацией о пациенте, добавьте:
+                    MouseArea {
+                        anchors.fill: parent
+                        onClicked: {
+                            var patientInfo = {
+                                patientId: model.patientId,
+                                fullName: model.fullName,
+                                diagnosis: model.diagnosis,
+                                roomNumber: model.roomNumber,
+                                passportData: model.passportData,
+                                doctorName: model.doctorName
+                            }
+                            stackView.push("PatientDetailPage.qml", { patientData: patientInfo })
+                        }
                     }
-                    Text {
-                        text: "📄 " + model.passportData
-                        font.pixelSize: 10; color: Qt.rgba(1,1,1,0.40)
+
+                    // Кнопка выписки (красная)
+                    Rectangle {
+                        width: 36; height: 36; radius: 8
+                        color: dischargeMouse.pressed ? "#B33A3A" : (dischargeMouse.containsMouse ? Qt.rgba(0.88, 0.32, 0.32, 0.8) : Qt.rgba(0.88, 0.32, 0.32, 0.5))
+                        Behavior on color { ColorAnimation { duration: 120 } }
+                        anchors.verticalCenter: parent.verticalCenter
+
+                        Text {
+                            anchors.centerIn: parent
+                            text: "✕"
+                            font.pixelSize: 16
+                            color: "#FFFFFF"
+                        }
+
+                        MouseArea {
+                            id: dischargeMouse
+                            anchors.fill: parent
+                            hoverEnabled: true
+                            cursorShape: Qt.PointingHandCursor
+                            onClicked: {
+                                confirmDialog.text = "Выписать пациента \"" + model.fullName + "\" из палаты " + model.roomNumber + "?"
+                                confirmDialog.acceptCallback = function() {
+                                    if (dbManager.dischargePatient(model.patientId)) {
+                                        patientsModel.refresh()
+                                        statusMessage.isSuccess = true
+                                        statusMessage.message = "Пациент выписан"
+                                    } else {
+                                        statusMessage.isError = true
+                                        statusMessage.message = "Ошибка выписки"
+                                    }
+                                    statusMessage.visible = true
+                                    hideTimer.restart()
+                                }
+                                confirmDialog.open()
+                            }
+                        }
                     }
                 }
             }
+
+            Text {
+                anchors.centerIn: parent
+                visible: patientsModel.count === 0
+                text: "Нет активных пациентов в палатах"
+                font.pixelSize: 14
+                color: Qt.rgba(1,1,1,0.50)
+            }
         }
 
-        Text {
-            anchors.centerIn: parent
-            visible: patientsModel.count === 0
-            text: "Нет пациентов"
-            font.pixelSize: 14
-            color: Qt.rgba(1,1,1,0.50)
+        StatusMessage {
+            id: statusMessage
+            Layout.fillWidth: true
+            Layout.margins: 12
+            visible: false
         }
     }
 }

@@ -45,6 +45,9 @@ qt_add_qml_module(appHospitalApp
         QML_FILES qml/RegisterDialog.qml
         QML_FILES qml/BackgroundWithDots.qml
         QML_FILES qml/WindowControls.qml
+        SOURCES doctorsmodel.h doctorsmodel.cpp
+        QML_FILES qml/DoctorsPage.qml
+        QML_FILES qml/PatientDetailPage.qml
 
 )
 
